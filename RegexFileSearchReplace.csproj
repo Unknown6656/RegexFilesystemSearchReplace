@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <LangVersion>preview</LangVersion>
+        <TargetFramework>net5.0</TargetFramework>
+        <ProjectGuid>{6DD2DAF0-A343-4ABC-AEAE-A56FBD1CE84E}</ProjectGuid>
+        <AssemblyName>rsr</AssemblyName>
+        <Nullable>enable</Nullable>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <OutputPath>bin</OutputPath>
+        <RootNamespace>regex</RootNamespace>
+        <StartupObject>regex.Program</StartupObject>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    </PropertyGroup>
+</Project>
