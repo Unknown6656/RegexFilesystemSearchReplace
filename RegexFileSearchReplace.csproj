@@ -1,16 +1,62 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <OutputType>Exe</OutputType>
-        <LangVersion>preview</LangVersion>
         <TargetFramework>net7.0</TargetFramework>
-        <!--<ProjectGuid>{6DD2DAF0-A343-4ABC-AEAE-A56FBD1CE84E}</ProjectGuid>-->
-        <AssemblyName>rsr</AssemblyName>
+
+        <LangVersion>preview</LangVersion>
+        <EnablePreviewFeatures>True</EnablePreviewFeatures>
+        <!-- <GenerateRequiresPreviewFeaturesAttribute>False</GenerateRequiresPreviewFeaturesAttribute> -->
         <Nullable>enable</Nullable>
+        <NullableContextOptions>enable</NullableContextOptions>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+        <AssemblyName>rsr</AssemblyName>
+        <OutputType>Exe</OutputType>
         <OutputPath>bin</OutputPath>
+
+        <Deterministic>true</Deterministic>
+        <IsPackable>true</IsPackable>
+        <!-- <TrimMode>Link</TrimMode> -->
+        <!-- <PublishTrimmed>true</PublishTrimmed> -->
+        <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
+        <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+        <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
+        <DisableWinExeOutputInference>true</DisableWinExeOutputInference>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+
+        <Authors>Unknown6656</Authors>
+        <Company>Unknown6656</Company>
+        <Product>Regex Filesystem Search and Replace Tool by Unknown6656</Product>
+        <Description>RSR - A Regex-based Filesystem Search and Replacement Tool developed by Unknown6656</Description>
+        <Copyright>Copyright © 2018-$([System.DateTime]::Today.ToString(yyyy)), unknown6656</Copyright>
+        <PackageProjectUrl>https://github.com/Unknown6656/RegexFilesystemSearchReplace</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/Unknown6656/RegexFilesystemSearchReplace</RepositoryUrl>
+        <PackageIcon>unknown6656-logo-1024.png</PackageIcon>
+        <PackageTags>unknown6656;regex;file;system;filesystem;find;finder;search;directory;path;replace;match</PackageTags>
+
+        <PackageId>Unknown6656.RSR</PackageId>
+        <IncludeSymbols>true</IncludeSymbols>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <RepositoryType>Git</RepositoryType>
+        <Version>$([System.IO.File]::ReadAllText("$(SolutionDir)version.txt"))</Version>
+        <PackageVersion>$([System.IO.File]::ReadAllText("$(SolutionDir)version.txt"))</PackageVersion>
+        <AssemblyVersion>$([System.IO.File]::ReadAllText("$(SolutionDir)version.txt"))</AssemblyVersion>
     </PropertyGroup>
     <ItemGroup>
-      <PackageReference Include="CommandLineParser" Version="2.9.1" />
+        <None Include="C:/Users/unknown6656/Pictures/unknown6656/unknown6656-logo-1024.png">
+            <Pack>True</Pack>
+            <PackagePath></PackagePath>
+        </None>
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="CommandLineParser" Version="2.9.1" />
+    </ItemGroup>
+    <ItemGroup>
+        <Compile Remove="old\**" />
+        <EmbeddedResource Remove="old\**" />
+        <None Remove="old\**" />
     </ItemGroup>
 </Project>
