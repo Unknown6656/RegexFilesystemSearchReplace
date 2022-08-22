@@ -98,55 +98,57 @@ examples:
 
 public abstract class CLI_Base
 {
-    [Option('c', HelpText = "Case sensitive search")]
+    [Option('c', "case", HelpText = "Case sensitive search.")]
     public bool CaseSensitive { get; set; }
 
-    [Option('q')]
+    [Option('q', "quiet", HelpText = "Quiet console output (only essential messages and results).")]
     public bool Quiet { get; set; }
 
-    [Option('r')]
+    [Option('r', "recursive", HelpText = "Recursively searches for filesystem entries.")]
     public bool Recursive { get; set; }
 
-    // Computer\HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\FileSystem\NtfsDisable8dot3NameCreation set to 0
-    [Option('s')]
+    [Option('s', "short-names", HelpText = "Display all filesystem entries using their short name (if available). The DWORD registry entry 'Computer\\HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Control\\FileSystem\\NtfsDisable8dot3NameCreation' should be set to '0' (not '1').")]
     public bool ShortNames { get; set; }
 
-    [Option('l')]
+    [Option('l', "detailed", HelpText = "Prints a detailed file list (i.e. including creation and modification date, as well as file size.)")]
     public bool DetailedFileList { get; set; }
 
-    [Option('d', SetName = "only_dirs")]
+    [Option('d', "only-dirs", SetName = "only_dirs", HelpText = "Only searches for directories (incompatible with '-f').")]
     public bool OnlyDirectories { get; set; }
 
-    [Option('f', SetName = "only_files")]
-    public bool OnlyFiles { get; set; }
+    [Option('f', "only-files", SetName = "only_files", HelpText = "Only searches for files (incompatible with '-d').")]
+    public bool OnlyFiles { get; set; } = false;
 
-    [Option('u')]
-    public bool FullPath { get; set; }
+    [Option('u', "full-path", HelpText = "Uses the entire path to perform a match instead of the file/directory name. This does not influence how the results will be displayed.")]
+    public bool FullPath { get; set; } = false;
 
-    [Option('n', "count", HelpText = "Limits to the first n results.", Default = -1)]
+    [Option('n', "count", HelpText = "Limits to the first n results (or last n results if combined with '-e').", Default = -1)]
     public int Count { get; set; } = -1;
+
+    [Option('e', "reverse", HelpText = "Reverses the search order.")]
+    public bool Reverse { get; set; } = false;
 
     public bool IsReplacement => this is CLI_Replace;
 
-    public abstract string Directory { get; set; }
+    //public abstract string Directory { get; set; }
 
-    public abstract string SearchPattern { get; set; }
+    //public abstract string SearchPattern { get; set; }
+
+    [Value(0, Required = true, HelpText = "The working directory (default value is '.').", MetaName = "directory")]
+    public /*override*/ string Directory { get; set; } = ".";
+
+    [Value(1, Required = true, HelpText = "The regex search pattern.", MetaName = "pattern")]
+    public /*override*/ string SearchPattern { get; set; } = "";
 }
 
 [Verb("s", HelpText = "Searches for file system entries matching a given pattern.")]
 public sealed class CLI_Search
     : CLI_Base
 {
-    [Value(0, Required = true, HelpText = "The working directory (default value is '.').", MetaName = "directory")]
-    public override string Directory { get; set; } = ".";
-
-    [Value(1, Required = true, HelpText = "The regex search pattern.", MetaName = "pattern")]
-    public override string SearchPattern { get; set; } = "";
-
-    [Option('i')]
+    [Option('i', "invert", HelpText = "Inverts the search results, meaning that all filesystem entries will be listed which do NOT match the provided regex pattern. This does NOT change the behaviour of flags such as '-f' or '-d'")]
     public bool InvertResults { get; set; }
 
-    [Option('x')]
+    [Option('x', "execute", HelpText = "Uses ShellExecute to execute/open/run the first result found.")]
     public bool Execute { get; set; }
 }
 
@@ -154,24 +156,23 @@ public sealed class CLI_Search
 public sealed class CLI_Replace
     : CLI_Base
 {
-    [Value(0, Required = true, HelpText = "The working directory (default value is '.').", MetaName = "directory")]
-    public override string Directory { get; set; } = ".";
+    //[Value(0, Required = true, HelpText = "The working directory (default value is '.').", MetaName = "directory")]
+    //public override string Directory { get; set; } = ".";
 
-    [Value(1, Required = true, HelpText = "The regex search pattern.", MetaName = "pattern")]
-    public override string SearchPattern { get; set; } = "";
+    //[Value(1, Required = true, HelpText = "The regex search pattern.", MetaName = "pattern")]
+    //public override string SearchPattern { get; set; } = "";
 
     [Value(2, Required = true, HelpText = "The replacement string.", MetaName = "replacement")]
     public string Replacement { get; set; } = "";
 
-
-    [Option('k')]
+    [Option('k', "mock", HelpText = "Performs a mock replacement, i.e. the file/directory will not be renamed or moved.")]
     public bool MockReplacement { get; set; }
 
-    [Option('m')]
-    public bool ReplaceMatchOnly { get; set; }
+    [Option('m', "match-only", HelpText = "Replaces only the matched segment with the replacement string instead of the entire filesystem entry name or path.")]
+    public bool ReplaceMatchOnly { get; set; } = false;
 
-    [Option('o')]
-    public bool ForceOverwrite { get; set; }
+    [Option('o', "overwrite", HelpText = "Forces the program to overwrite existing files during moving/renaming.", Default = false)]
+    public bool ForceOverwrite { get; set; } = false;
 }
 
 
@@ -282,7 +283,10 @@ public static class Program
                                                                            _ => false,
                                                                        }
                                                                        let display = entry.FullName.GetPath(arguments)
-                                                                       select (entry, match, path, display + (entry is DirectoryInfo ? "\\" + ""));
+                                                                       select (entry, match, path, display + (entry is DirectoryInfo ? "\\" : ""));
+
+        if (arguments.Reverse)
+            results = results.Reverse();
 
         if (arguments.Count >= 0)
             results = results.Take(arguments.Count);
@@ -466,6 +470,9 @@ public static class Program
 
     public static string GetPath(this string path, CLI_Base arguments)
     {
+        if (!arguments.DetailedFileList)
+            path = Path.GetRelativePath(Environment.CurrentDirectory, path);
+
         if (!arguments.ShortNames)
             return path;
 
